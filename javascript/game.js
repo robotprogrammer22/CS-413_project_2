@@ -42,9 +42,6 @@ bug_y = 0;
 // for a 400 x 400 grid with 10 spaces each way, each square should be 40 pixels
 // need to place in the middle of those squares, so start off with 40 * square_number + 20?
 
-// if needed could set the coordinates in the array for the x and y and get the coordinates from there
-
-
 
 function placeBug()
 {	
@@ -59,9 +56,6 @@ function placeBug()
 	
 	bug.position.x = bug_x;
 	bug.position.y = bug_y;
-	
-	//console.log(bug_x);
-	//console.log(bug_y);
 	
 	stage.addChild(bug);
 }
@@ -78,8 +72,8 @@ function bugCollected()
 
 function moveDown(current_x, current_y)
 {
-	// checks to see if already in top square
-	// 340 is the center of the top square
+	// checks to see if already in the bottom square
+	// 340 is the center of the bottom square
 	if (current_y < 340)
 	{
 		current_location_y = current_y + 40;
@@ -90,8 +84,11 @@ function moveDown(current_x, current_y)
 
 function moveLeft(current_x, current_y)
 {
+	// changes bird direction
 	bird.scale.x = 0.65;
 	
+	// checks to see if bird is is already in the far left square
+	// 60 is the center of the last square the bird can go in
 	if (current_x > 60)
 	{
 		current_location_x = current_x - 40;
@@ -102,7 +99,11 @@ function moveLeft(current_x, current_y)
 
 function moveRight(current_x, current_y)
 {
+	// changes bird direction
 	bird.scale.x = -0.65;
+	
+	// checks if bird is already in far right square
+	// 340 is the center of the last right square the bird can go in
 	if (current_x < 340)
 	{
 		current_location_x = current_x + 40;
@@ -113,7 +114,8 @@ function moveRight(current_x, current_y)
 
 function moveUp(current_x, current_y)
 {
-	//if (current_y > 20)
+	// checks to see if bird is already in the top square
+	// 60 is the highest the bird can go (center of top square)
 	if (current_y > 60)
 	{
 		current_location_y = current_y - 40;
@@ -124,21 +126,25 @@ function moveUp(current_x, current_y)
 
 function keyPress(key)
 {
+	// w = up
 	if (key.keyCode == 87)
 	{
 		moveUp(current_location_x, current_location_y);
 	}
 	
+	// a = left
 	if (key.keyCode == 65)
 	{
 		moveLeft(current_location_x, current_location_y);
 	}
 	
+	// s = down
 	if (key.keyCode == 83)
 	{
 		moveDown(current_location_x, current_location_y);
 	}
 	
+	// d = right
 	if (key.keyCode == 68)
 	{
 		moveRight(current_location_x, current_location_y);
@@ -152,7 +158,6 @@ placeBug();
 function animate()
 {
 	requestAnimationFrame(animate);
-	//bird.rotation += 0.1;
 	bugCollected();
 	renderer.render(stage);
 }
