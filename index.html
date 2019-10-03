@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Bug Catcher</title>
+	</head>
+	<body>
+		<div>
+			<h1>Welcome!</h1>
+		</div>
+		
+		<div>
+			<h2>Game</h2>
+			<div id="gameport"></div>
+		</div>
+		<div>
+			<h2>Game Instructions</h2>
+			<p>
+				Move the bird to catch the beetle. <br>
+				Use the following keys to control the bird: <br>
+					W - move up <br>
+					A - move left <br>
+					S - move down <br>
+					D - move right <br>
+			</p>
+		</div>
+		<div>
+			<h2>Comments</h2>
+			<div id="disqus_thread"></div>
+
+			<script>
+				(function() {
+					var d = document, s = d.createElement('script');
+					s.src = 'https://nau-cs413.disqus.com/embed.js';
+					s.setAttribute('data-timestamp', +new Date());
+					(d.head || d.body).appendChild(s);
+				})(); 
+			</script>
+		</div>
+		
+		<!-- needs to be at the bottom or gameport is null -->
+		<script src="javascript/pixi.js"></script>
+		<script src="javascript/game.js"></script>
+		
+	</body>
+</html>
