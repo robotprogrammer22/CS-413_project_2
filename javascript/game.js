@@ -21,6 +21,9 @@ var bug = new PIXI.Sprite(bug_texture);
 var start_text = PIXI.Texture.fromImage("images/Start.png");
 var start = new PIXI.Sprite(start_text);
 
+
+var bug_count = 0;
+
 gameport.appendChild(renderer.view);
 
 bird.anchor.x = 0.5;
@@ -79,13 +82,22 @@ function displayStartScreen()
 
 function selectOption()
 {
-	if (bug.position.y == 175)
+	if (menu == true)
 	{
-		menu = false;
-		stage.removeChild(start_screen);
-		stage.addChild(game_screen);
-		placeBug();
+		if (bug.position.y == 175)
+		{
+			menu = false;
+			stage.removeChild(start_screen);
+			stage.addChild(game_screen);
+			placeBug();
+		}
 	}
+}
+
+function tweenFinish(new_x, new_y)
+{
+	bug_x = new_x;
+	bug_y = new_y;
 }
 
 
@@ -114,7 +126,12 @@ function bugCollected()
 	{
 		//stage.removeChild(bug);
 		game_screen.removeChild(bug);
+		bug_count += 1;
 		placeBug();
+		if (bug_count >= 10)
+		{
+			console.log("10 bugs");
+		}
 	}
 }
 
@@ -222,6 +239,25 @@ function keyPress(key)
 
 
 document.addEventListener("keydown", keyPress);
+
+
+setInterval(function(){
+	if (bug_count >= 10)
+	{
+		bug_x_square = Math.round(((Math.random()) * 7) + 1);
+		bug_y_square = Math.round(((Math.random()) * 7) + 1);
+	
+		new_bug_x = bug_x_square * 40 + 20;
+		new_bug_y = bug_y_square * 40 + 20;
+		
+		createjs.Tween.get(bug).to({x: new_bug_x, y: new_bug_y}, 1000).call(tweenFinish, [new_bug_x, new_bug_y]);
+	
+		//bug.position.x = bug_x;
+		//bug.position.y = bug_y;
+	}
+}, 3000);
+
+
 
 function animate()
 {
