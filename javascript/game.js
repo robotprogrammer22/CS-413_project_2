@@ -1,11 +1,25 @@
 var gameport = document.getElementById("gameport");
 var renderer = PIXI.autoDetectRenderer({width: 400, height: 400, backgroundColor: 0xf5fcf7});
 var stage = new PIXI.Container();
+
+var start_screen = new PIXI.Container();
+var game_screen = new PIXI.Container();
+
+//stage.addChild(game_screen);
+stage.addChild(start_screen);
+var menu = true;
+
+
+
+// declares textures and variables for sprites
 var bird_texture = PIXI.Texture.fromImage("images/bird-100px-copy.png");
 var bird = new PIXI.Sprite(bird_texture);
 
 var bug_texture = PIXI.Texture.fromImage("images/beetle.png");
 var bug = new PIXI.Sprite(bug_texture);
+
+var start_text = PIXI.Texture.fromImage("images/Start.png");
+var start = new PIXI.Sprite(start_text);
 
 gameport.appendChild(renderer.view);
 
@@ -18,7 +32,8 @@ bird.position.y = 200;
 bird.scale.x = 0.65;
 bird.scale.y = 0.65;
 
-stage.addChild(bird);
+//stage.addChild(bird);
+game_screen.addChild(bird);
 
 
 bug.anchor.x = 0.5;
@@ -43,6 +58,37 @@ bug_y = 0;
 // need to place in the middle of those squares, so start off with 40 * square_number + 20?
 
 
+function displayStartScreen()
+{
+	start.anchor.x = 0;
+	start.anchor.y = 0.5;
+	start.position.x = 175;
+	start.position.y = 175;
+	
+	start.scale.x = 0.5;
+	start.scale.y = 0.5;
+	
+	stage.addChild(start_screen);
+	start_screen.addChild(start);
+	
+	bug.position.x = 150;
+	bug.position.y = 175;
+	
+	start_screen.addChild(bug);
+}
+
+function selectOption()
+{
+	if (bug.position.y == 175)
+	{
+		menu = false;
+		stage.removeChild(start_screen);
+		stage.addChild(game_screen);
+		placeBug();
+	}
+}
+
+
 function placeBug()
 {	
 	// randomly chooses a square between 1-8 (inclusive)
@@ -57,14 +103,17 @@ function placeBug()
 	bug.position.x = bug_x;
 	bug.position.y = bug_y;
 	
-	stage.addChild(bug);
+	//stage.addChild(bug);
+	game_screen.addChild(bug);
+	
 }
 
 function bugCollected()
 {
 	if ((bug_x == current_location_x) && (bug_y == current_location_y))
 	{
-		stage.removeChild(bug);
+		//stage.removeChild(bug);
+		game_screen.removeChild(bug);
 		placeBug();
 	}
 }
@@ -129,7 +178,14 @@ function keyPress(key)
 	// w = up
 	if (key.keyCode == 87)
 	{
-		moveUp(current_location_x, current_location_y);
+		if (menu != true)
+		{
+			moveUp(current_location_x, current_location_y);
+		}
+		else
+		{
+			bug.position.y = 175;
+		}
 	}
 	
 	// a = left
@@ -141,7 +197,14 @@ function keyPress(key)
 	// s = down
 	if (key.keyCode == 83)
 	{
-		moveDown(current_location_x, current_location_y);
+		if (menu != true)
+		{
+			moveDown(current_location_x, current_location_y);
+		}
+		else
+		{
+			bug.position.y = 225;
+		}
 	}
 	
 	// d = right
@@ -149,11 +212,16 @@ function keyPress(key)
 	{
 		moveRight(current_location_x, current_location_y);
 	}
+	
+	// enter
+	if (key.keyCode == 13)
+	{
+		selectOption();
+	}
 }
 
 
 document.addEventListener("keydown", keyPress);
-placeBug();
 
 function animate()
 {
@@ -161,4 +229,8 @@ function animate()
 	bugCollected();
 	renderer.render(stage);
 }
+
+// enter = 13
+displayStartScreen();
+
 animate();
