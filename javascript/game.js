@@ -4,47 +4,30 @@ var stage = new PIXI.Container();
 
 var start_screen = new PIXI.Container();
 var game_screen = new PIXI.Container();
+var end_screen = new PIXI.Container();
 
-//stage.addChild(game_screen);
+
 stage.addChild(start_screen);
 var menu = true;
 
 
+PIXI.loader
+	.add("spritesheet/sprites.json")
+	.add("sounds/bug_catch.wav")
+	.load(ready);
+
 
 // declares textures and variables for sprites
-var bird_texture = PIXI.Texture.fromImage("images/bird-100px-copy.png");
-var bird = new PIXI.Sprite(bird_texture);
-
-var bug_texture = PIXI.Texture.fromImage("images/beetle.png");
-var bug = new PIXI.Sprite(bug_texture);
-
 var start_text = PIXI.Texture.fromImage("images/Start.png");
 var start = new PIXI.Sprite(start_text);
 
+var bird;
+var bug;
 
 var bug_count = 0;
-
 gameport.appendChild(renderer.view);
 
-bird.anchor.x = 0.5;
-bird.anchor.y = 0.5;
-
-bird.position.x = 200;
-bird.position.y = 200;
-
-bird.scale.x = 0.65;
-bird.scale.y = 0.65;
-
-//stage.addChild(bird);
-game_screen.addChild(bird);
-
-
-bug.anchor.x = 0.5;
-bug.anchor.y = 0.5;
-
-bug.scale.x = 1;
-bug.scale.y = 1;
-
+var bug_sound;
 
 // for a 400 x 400 grid with 10 spaces each way, each square should be 40 pixels
 // need to place in the middle of those squares, so start off with 40 * square_number + 20
@@ -60,21 +43,41 @@ current_location_y = 180;
 bug_x = 0;
 bug_y = 0;
 
-/*
-var sound_loader = new PIXI.Loader();
-sound_loader.add("bug_sound", "../sounds/bug_catch.wav");
-sound_loader.load(ready);
-*/
-
-//var bug_sound = PIXI.sound.Sound.from("sounds/bug_catch.wav");
-	
-//var bug_sound;
+// if resources are loaded, this runs
 function ready()
 {
-	bug_sound = PIXI.audioManager.getAudio("../sounds/bug_catch.wav");
+	
+	var sheet = PIXI.loader.resources["spritesheet/sprites.json"];
+	
+	bird = new PIXI.Sprite(sheet.textures["bird-100px-copy.png"]);
+	bug =  new PIXI.Sprite(sheet.textures["beetle.png"]);
+
+		
+
+	bird.anchor.x = 0.5;
+	bird.anchor.y = 0.5;
+
+	bird.position.x = 200;
+	bird.position.y = 200;
+
+	bird.scale.x = 0.65;
+	bird.scale.y = 0.65;
+
+	game_screen.addChild(bird);
+
+
+	bug.anchor.x = 0.5;
+	bug.anchor.y = 0.5;
+
+	bug.scale.x = 1;
+	bug.scale.y = 1;
+	
+	bug_sound = PIXI.audioManager.getAudio(PIXI.loader.resources["bug_catch.wav"]);
+	
+	displayStartScreen();
 }
 
-
+// displays start menu
 function displayStartScreen()
 {
 	start.anchor.x = 0;
@@ -94,6 +97,24 @@ function displayStartScreen()
 	start_screen.addChild(bug);
 }
 
+// displays credits
+function displayEndScreen()
+{
+	var graphics_texture = PIXI.Texture.fromImage("images/graphics.png");
+	var graphics = new PIXI.Sprite(graphics_texture);
+	
+	graphics.anchor.x = 0.5;
+	graphics.anchor.y = 0.5;
+	graphics.position.x = 200;
+	graphics.position.y = 200;
+	
+	end_screen.addChild(graphics);
+	
+	stage.removeChild(game_screen);
+	stage.addChild(end_screen);
+}
+
+// menu selection
 function selectOption()
 {
 	if (menu == true)
@@ -108,13 +129,14 @@ function selectOption()
 	}
 }
 
+// update bug variables
 function tweenFinish(new_x, new_y)
 {
 	bug_x = new_x;
 	bug_y = new_y;
 }
 
-
+// places the bug
 function placeBug()
 {	
 	// randomly chooses a square between 1-8 (inclusive)
@@ -134,21 +156,15 @@ function placeBug()
 	
 }
 
+// checks if bug has been collected
 function bugCollected()
 {
 	if ((bug_x == current_location_x) && (bug_y == current_location_y))
 	{
-		//stage.removeChild(bug);
-		//bug_sound.play();
-		//resources.bug_sound.sound.play();
-		//sound.play();
+		bug_sound.play();
 		game_screen.removeChild(bug);
 		bug_count += 1;
 		placeBug();
-		if (bug_count >= 10)
-		{
-			console.log("10 bugs");
-		}
 	}
 }
 
@@ -259,7 +275,7 @@ document.addEventListener("keydown", keyPress);
 
 
 setInterval(function(){
-	if (bug_count >= 10)
+	if (bug_count >= 5)
 	{
 		bug_x_square = Math.round(((Math.random()) * 7) + 1);
 		bug_y_square = Math.round(((Math.random()) * 7) + 1);
@@ -280,10 +296,14 @@ function animate()
 {
 	requestAnimationFrame(animate);
 	bugCollected();
+	if (bug_count >= 10)
+	{
+		displayEndScreen();
+	}
 	renderer.render(stage);
 }
 
 // enter = 13
-displayStartScreen();
+//displayStartScreen();
 
 animate();
