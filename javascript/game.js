@@ -66,7 +66,7 @@ sound_loader.add("bug_sound", "../sounds/bug_catch.wav");
 sound_loader.load(ready);
 */
 
-var bug_sound = PIXI.sound.Sound.from("sounds/bug_catch.wav");
+//var bug_sound = PIXI.sound.Sound.from("sounds/bug_catch.wav");
 	
 //var bug_sound;
 function ready()
@@ -139,7 +139,7 @@ function bugCollected()
 	if ((bug_x == current_location_x) && (bug_y == current_location_y))
 	{
 		//stage.removeChild(bug);
-		bug_sound.play();
+		//bug_sound.play();
 		//resources.bug_sound.sound.play();
 		//sound.play();
 		game_screen.removeChild(bug);
