@@ -11,15 +11,21 @@ stage.addChild(start_screen);
 var menu = true;
 
 
+PIXI.sound.add("caughtBug", "sounds/bug_catch.mp3");
+
+
 PIXI.loader
 	.add("spritesheet/sprites.json")
-	.add("sounds/bug_catch.wav")
 	.load(ready);
 
 
 // declares textures and variables for sprites
+
 var start_text = PIXI.Texture.fromImage("images/Start.png");
 var start = new PIXI.Sprite(start_text);
+
+var instructions_text = PIXI.Texture.fromImage("images/instructions.png");
+var instructions = new PIXI.Sprite(instructions_text);
 
 var bird;
 var bug;
@@ -27,7 +33,8 @@ var bug;
 var bug_count = 0;
 gameport.appendChild(renderer.view);
 
-var bug_sound;
+var instructions;
+
 
 // for a 400 x 400 grid with 10 spaces each way, each square should be 40 pixels
 // need to place in the middle of those squares, so start off with 40 * square_number + 20
@@ -43,6 +50,8 @@ current_location_y = 180;
 bug_x = 0;
 bug_y = 0;
 
+
+
 // if resources are loaded, this runs
 function ready()
 {
@@ -52,7 +61,6 @@ function ready()
 	bird = new PIXI.Sprite(sheet.textures["bird-100px-copy.png"]);
 	bug =  new PIXI.Sprite(sheet.textures["beetle.png"]);
 
-		
 
 	bird.anchor.x = 0.5;
 	bird.anchor.y = 0.5;
@@ -63,6 +71,7 @@ function ready()
 	bird.scale.x = 0.65;
 	bird.scale.y = 0.65;
 
+
 	game_screen.addChild(bird);
 
 
@@ -72,10 +81,9 @@ function ready()
 	bug.scale.x = 1;
 	bug.scale.y = 1;
 	
-	bug_sound = PIXI.audioManager.getAudio(PIXI.loader.resources["bug_catch.wav"]);
-	
 	displayStartScreen();
 }
+
 
 // displays start menu
 function displayStartScreen()
@@ -88,8 +96,19 @@ function displayStartScreen()
 	start.scale.x = 0.5;
 	start.scale.y = 0.5;
 	
+	
+	instructions.anchor.x = 0;
+	instructions.anchor.y = 0.5;
+	instructions.position.x = 175;
+	instructions.position.y = 225;
+	
+	instructions.scale.x = 0.5;
+	instructions.scale.y = 0.5;
+	
+	
 	stage.addChild(start_screen);
 	start_screen.addChild(start);
+	start_screen.addChild(instructions);
 	
 	bug.position.x = 150;
 	bug.position.y = 175;
@@ -126,6 +145,21 @@ function selectOption()
 			stage.addChild(game_screen);
 			placeBug();
 		}
+		else if (bug.position.y == 225)
+		{
+			stage.removeChild(start_screen);
+			
+			instructions = new PIXI.Text("Catch 10 bugs by moving the bird \n" +
+				"w = up, \na = left, \ns = down, \nd = right");
+				
+			stage.addChild(instructions);
+		}
+		else
+		{
+			stage.removeChild(instructions);
+			stage.removeChild(game_screen);
+			displayStartScreen();
+		}
 	}
 }
 
@@ -151,7 +185,6 @@ function placeBug()
 	bug.position.x = bug_x;
 	bug.position.y = bug_y;
 	
-	//stage.addChild(bug);
 	game_screen.addChild(bug);
 	
 }
@@ -161,7 +194,7 @@ function bugCollected()
 {
 	if ((bug_x == current_location_x) && (bug_y == current_location_y))
 	{
-		bug_sound.play();
+		PIXI.sound.play("caughtBug");
 		game_screen.removeChild(bug);
 		bug_count += 1;
 		placeBug();
@@ -284,9 +317,6 @@ setInterval(function(){
 		new_bug_y = bug_y_square * 40 + 20;
 		
 		createjs.Tween.get(bug).to({x: new_bug_x, y: new_bug_y}, 1000).call(tweenFinish, [new_bug_x, new_bug_y]);
-	
-		//bug.position.x = bug_x;
-		//bug.position.y = bug_y;
 	}
 }, 3000);
 
@@ -298,12 +328,10 @@ function animate()
 	bugCollected();
 	if (bug_count >= 10)
 	{
+		bug_count = 0;
 		displayEndScreen();
 	}
 	renderer.render(stage);
 }
-
-// enter = 13
-//displayStartScreen();
 
 animate();
