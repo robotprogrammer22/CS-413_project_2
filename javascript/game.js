@@ -46,6 +46,9 @@ bug.scale.x = 1;
 bug.scale.y = 1;
 
 
+// for a 400 x 400 grid with 10 spaces each way, each square should be 40 pixels
+// need to place in the middle of those squares, so start off with 40 * square_number + 20
+
 game_map = [10][10];
 // squares are numbered 0-9
 // squares the bird can go in are 1-8
@@ -57,8 +60,19 @@ current_location_y = 180;
 bug_x = 0;
 bug_y = 0;
 
-// for a 400 x 400 grid with 10 spaces each way, each square should be 40 pixels
-// need to place in the middle of those squares, so start off with 40 * square_number + 20?
+/*
+var sound_loader = new PIXI.Loader();
+sound_loader.add("bug_sound", "../sounds/bug_catch.wav");
+sound_loader.load(ready);
+*/
+
+var bug_sound = PIXI.sound.Sound.from("sounds/bug_catch.wav");
+	
+//var bug_sound;
+function ready()
+{
+	bug_sound = PIXI.audioManager.getAudio("../sounds/bug_catch.wav");
+}
 
 
 function displayStartScreen()
@@ -125,6 +139,9 @@ function bugCollected()
 	if ((bug_x == current_location_x) && (bug_y == current_location_y))
 	{
 		//stage.removeChild(bug);
+		bug_sound.play();
+		//resources.bug_sound.sound.play();
+		//sound.play();
 		game_screen.removeChild(bug);
 		bug_count += 1;
 		placeBug();
